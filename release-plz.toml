@@ -1,0 +1,9 @@
+[workspace]
+# Don't publish to crates.io
+publish = false
+
+# Don't create GitHub releases — release.yml handles that with cross-compiled binaries
+git_release_enable = false
+
+# Always update CHANGELOG.md
+changelog_update = true

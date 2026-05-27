@@ -100,9 +100,10 @@ jobs:
       - name: Package binary
         run: |
           VERSION="${{ needs.validate.outputs.version }}"
-          NAME="arch-live-${VERSION}-${{ matrix.target }}"
+          TARGET="${{ matrix.target }}"
+          NAME="arch-live-${VERSION}-${TARGET}"
           mkdir -p "dist/${NAME}"
-          cp "target/${{ matrix.target }}/release/arch-live" "dist/${NAME}/"
+          cp "target/${TARGET}/release/arch-live" "dist/${NAME}/"
           tar -C dist -czf "${NAME}.tar.gz" "${NAME}"
           if command -v sha256sum >/dev/null; then
             sha256sum "${NAME}.tar.gz" > "${NAME}.tar.gz.sha256"
@@ -139,3 +140,55 @@ jobs:
           files: dist/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  sync-readme:
+    name: Sync README version
+    needs: [validate, publish]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Update README markers
+        run: bash scripts/sync-readme-version.sh "${{ needs.validate.outputs.version }}"
+
+      - name: Commit and push
+        run: |
+          if git diff --quiet README.md; then
+            echo "README already up to date"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "docs: sync README to v${{ needs.validate.outputs.version }} [skip ci]"
+          git push
+
+  homebrew:
+    name: Update Homebrew tap
+    needs: [validate, publish]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check Homebrew tap token
+        id: check-token
+        run: |
+          if [ -z "${{ secrets.HOMEBREW_TAP_TOKEN }}" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "HOMEBREW_TAP_TOKEN not set — skipping Homebrew update"
+            echo "To enable: create a PAT with repo write access to RetardRento/homebrew-archlive"
+            echo "Then add it as a repository secret named HOMEBREW_TAP_TOKEN"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Update Homebrew formula
+        if: steps.check-token.outputs.skip == 'false'
+        env:
+          VERSION: ${{ needs.validate.outputs.version }}
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          TAP_REPO: RetardRento/homebrew-archlive
+        run: bash scripts/update-homebrew-tap.sh

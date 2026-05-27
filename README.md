@@ -4,9 +4,12 @@ Zero-config real-time architecture visualizer for Node.js and Bun applications.
 
 **Repository:** [github.com/RetardRento/archlive](https://github.com/RetardRento/archlive)
 
+[![GitHub release](https://img.shields.io/github/v/release/RetardRento/archlive?style=flat-square)](https://github.com/RetardRento/archlive/releases/latest)
+<!-- archlive-version:v0.1.0 -->
+
 ## Install (pre-built binaries)
 
-Download the latest release for your platform from GitHub:
+Each [release](https://github.com/RetardRento/archlive/releases) is tagged (e.g. `v0.1.0`) with versioned binaries. The examples below pin a specific version — after a new release, CI updates these snippets on `main` automatically.
 
 **[⬇ Latest release](https://github.com/RetardRento/archlive/releases/latest)**
 
@@ -17,7 +20,7 @@ Download the latest release for your platform from GitHub:
 | Linux (x86_64) | `arch-live-<version>-x86_64-unknown-linux-gnu.tar.gz` |
 | Linux (ARM64) | `arch-live-<version>-aarch64-unknown-linux-gnu.tar.gz` |
 
-Replace `<version>` with the release tag (without `v`), e.g. `0.1.0`.
+Replace `<version>` with the release number (no `v`), or use the `VERSION` variable in the scripts.
 
 ### macOS (Apple Silicon)
 
@@ -64,9 +67,7 @@ chmod +x "arch-live-${VERSION}-aarch64-unknown-linux-gnu/arch-live"
 sudo mv "arch-live-${VERSION}-aarch64-unknown-linux-gnu/arch-live" /usr/local/bin/arch-live
 ```
 
-> **Tip:** For the newest build without editing `VERSION`, open the [latest release](https://github.com/RetardRento/archlive/releases/latest) page and copy the download URL for your platform.
-
-Each release also includes `.sha256` checksum files you can verify with `shasum -a 256 -c arch-live-*.tar.gz.sha256` (after renaming the checksum file to match the archive name, or by comparing manually).
+Checksums are attached to each release (e.g. `arch-live-0.1.0-x86_64-unknown-linux-gnu.tar.gz.sha256`).
 
 ## Build from source
 
@@ -176,20 +177,47 @@ Collector ──(CollectorEvent)──▶ Analyzer ──(GraphSnapshot)──�
 
 ## Releasing a new version (maintainers)
 
-Releases are automated with [GitHub Actions](https://github.com/RetardRento/archlive/actions).
+Releases are **fully automated** via [release-plz](https://release-plz.ieni.dev/) and [GitHub Actions](https://github.com/RetardRento/archlive/actions). No manual version bumps or tagging needed.
 
-1. Bump the version in `Cargo.toml` (must match the git tag, without the `v` prefix).
-2. Commit and push to `main`.
-3. Create and push a tag:
+### Automated flow
 
-```bash
-git tag v0.1.0
-git push origin v0.1.0
-```
+1. Merge a PR that changes `src/` or `Cargo.toml` into `main`
+2. **Release PLZ** workflow opens a "Release PR" with:
+   - Bumped version in `Cargo.toml` (based on [conventional commits](#commit-convention))
+   - Updated `CHANGELOG.md`
+3. Review and merge the Release PR
+4. **Release PLZ** creates the git tag automatically
+5. **Release** workflow triggers and:
+   - Builds cross-compiled binaries for all platforms
+   - Publishes a tagged [GitHub Release](https://github.com/RetardRento/archlive/releases) with generated release notes
+   - Updates README install snippets on `main`
+   - Updates the Homebrew tap formula (if `HOMEBREW_TAP_TOKEN` secret is configured)
 
-The **Release** workflow builds binaries for all supported targets, uploads them to a [GitHub Release](https://github.com/RetardRento/archlive/releases), and generates release notes.
+### Commit convention
 
-To re-run a release manually: **Actions → Release → Run workflow** and enter the tag (e.g. `v0.1.0`).
+Version bumps follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+| Prefix | Bump |
+|--------|------|
+| `fix:` | patch (`0.1.0` → `0.1.1`) |
+| `feat:` | minor (`0.1.0` → `0.2.0`) |
+| `feat!:` / `BREAKING CHANGE:` | major (`0.1.0` → `1.0.0`) |
+| `chore:` / `docs:` / `ci:` | no release triggered |
+
+### Homebrew tap setup (one-time)
+
+1. Create repo `RetardRento/homebrew-archlive` with a `Formula/` directory
+2. Create a GitHub PAT with `repo` write access to that repo
+3. Add it as a repository secret named `HOMEBREW_TAP_TOKEN` in this repo
+4. Users can then install via:
+   ```bash
+   brew tap RetardRento/archlive
+   brew install arch-live
+   ```
+
+### Manual re-release
+
+To re-run a release for an existing tag: **Actions → Release → Run workflow** and enter the tag (e.g. `v0.1.0`).
 
 The **CI** workflow runs on every push/PR to `main` and verifies `cargo build` and `cargo test` on Linux and macOS.
 
