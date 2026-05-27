@@ -24,5 +24,18 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
 
       - uses: MarcoIeni/release-plz-action@v0.5
+        id: release-plz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Auto-merge Release PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR=$(gh pr list --label "release-plz" --state open --json number --jq '.[0].number')
+          if [ -z "$PR" ] || [ "$PR" = "null" ]; then
+            echo "No open release-plz PR found — nothing to auto-merge"
+            exit 0
+          fi
+          echo "Enabling auto-merge on Release PR #${PR}"
+          gh pr merge "$PR" --auto --merge
