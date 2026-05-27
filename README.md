@@ -101,9 +101,21 @@ cargo build --release
 # Filter to a specific port
 ./target/release/arch-live --port-filter 3000
 
+# HTTP tap proxy — intercept requests between frontend and backend
+./target/release/arch-live --tap 3001:3000
+
 # During development (cargo run)
 cargo run -- --node-only
 ```
+
+### Flags
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--refresh-rate <SECONDS>` | `1.0` | Polling interval (decimals OK, min 0.1) |
+| `--port-filter <PORT>` | — | Only show connections involving this port |
+| `--node-only` | off | Focus on Node.js and Bun processes only |
+| `--tap <LISTEN:TARGET>` | — | HTTP tap proxy (see below) |
 
 ### Keyboard controls
 
@@ -113,6 +125,43 @@ cargo run -- --node-only
 | `n` | Toggle Node/Bun-only view |
 | `↑` / `↓` | Navigate service list |
 | `r` | Force refresh |
+
+## HTTP tap proxy (`--tap`)
+
+The tap proxy sits between your frontend and backend, intercepting every HTTP request to capture method, path, status code, and duration — without modifying your application code.
+
+```bash
+arch-live --tap 3001:3000
+```
+
+```
+Frontend  →  :3001 (arch-live tap)  →  :3000 (your backend)
+                      ↕
+              logs every request
+```
+
+Point your frontend at the tap port instead of the backend directly:
+
+```bash
+# Backend runs on :3000
+node server.js
+
+# Start arch-live with tap
+arch-live --tap 3001:3000
+
+# Frontend calls :3001 — arch-live intercepts and forwards to :3000
+curl http://localhost:3001/api/users
+```
+
+Every intercepted request appears in the Live Events panel:
+
+```
+[14:32:01] GET  /api/users        200  12ms
+[14:32:02] POST /api/orders       201  34ms
+[14:32:03] GET  /api/missing      404   8ms
+```
+
+> **Note:** Works for plain HTTP. For HTTPS, terminate TLS before the tap (e.g. a local `mkcert` proxy).
 
 ## Example — detecting a Node.js + Bun app
 
