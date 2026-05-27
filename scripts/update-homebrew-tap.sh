@@ -81,7 +81,7 @@ FILE_META=$(curl -sSL \
   -H "Accept: application/vnd.github.v3+json" \
   "https://api.github.com/repos/${TAP_REPO}/contents/${FORMULA_PATH}" 2>/dev/null || echo '{}')
 
-FILE_SHA=$(echo "$FILE_META" | grep -o '"sha": "[^"]*"' | head -1 | cut -d'"' -f4)
+FILE_SHA=$(echo "$FILE_META" | grep -o '"sha": "[^"]*"' | head -1 | cut -d'"' -f4 || true)
 
 CONTENT=$(printf '%s' "$FORMULA" | base64 | tr -d '\n')
 
