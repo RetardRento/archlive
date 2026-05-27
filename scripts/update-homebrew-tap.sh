@@ -76,7 +76,7 @@ EOF
 )
 
 echo "Fetching current formula SHA from tap repo..."
-FILE_META=$(curl -fsSL \
+FILE_META=$(curl -sSL \
   -H "Authorization: token ${GITHUB_TOKEN}" \
   -H "Accept: application/vnd.github.v3+json" \
   "https://api.github.com/repos/${TAP_REPO}/contents/${FORMULA_PATH}" 2>/dev/null || echo '{}')
