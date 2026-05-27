@@ -206,12 +206,12 @@ Version bumps follow [Conventional Commits](https://www.conventionalcommits.org/
 
 ### Homebrew tap setup (one-time)
 
-1. Create repo `RetardRento/homebrew-archlive` with a `Formula/` directory
+1. Create repo `RetardRento/homebrew-tap` with a `Formula/` directory
 2. Create a GitHub PAT with `repo` write access to that repo
 3. Add it as a repository secret named `HOMEBREW_TAP_TOKEN` in this repo
 4. Users can then install via:
    ```bash
-   brew tap RetardRento/archlive
+   brew tap RetardRento/tap
    brew install arch-live
    ```
 

@@ -5,7 +5,7 @@ set -euo pipefail
 
 VERSION="${VERSION:?VERSION required (e.g. 0.2.0)}"
 GITHUB_TOKEN="${HOMEBREW_TAP_TOKEN:?HOMEBREW_TAP_TOKEN required}"
-TAP_REPO="${TAP_REPO:-RetardRento/homebrew-archlive}"
+TAP_REPO="${TAP_REPO:-RetardRento/homebrew-tap}"
 FORMULA_PATH="Formula/arch-live.rb"
 BASE_URL="https://github.com/RetardRento/archlive/releases/download/v${VERSION}"
 

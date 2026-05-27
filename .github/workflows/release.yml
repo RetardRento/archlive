@@ -190,5 +190,5 @@ jobs:
         env:
           VERSION: ${{ needs.validate.outputs.version }}
           HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
-          TAP_REPO: RetardRento/homebrew-archlive
+          TAP_REPO: RetardRento/homebrew-tap
         run: bash scripts/update-homebrew-tap.sh
