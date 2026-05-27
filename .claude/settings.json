@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cargo build *)",
+      "Read(//usr/local/bin/**)",
+      "Read(//Users/koukar/.cargo/bin/**)",
+      "Read(//opt/homebrew/bin/**)",
+      "Read(//usr/bin/**)",
+      "Read(//Users/koukar/**)"
+    ]
+  }
+}
