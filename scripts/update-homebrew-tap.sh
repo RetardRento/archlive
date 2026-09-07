@@ -5,9 +5,9 @@ set -euo pipefail
 
 VERSION="${VERSION:?VERSION required (e.g. 0.2.0)}"
 GITHUB_TOKEN="${HOMEBREW_TAP_TOKEN:?HOMEBREW_TAP_TOKEN required}"
-TAP_REPO="${TAP_REPO:-RetardRento/homebrew-tap}"
+TAP_REPO="${TAP_REPO:-karthikeyasomayajula/homebrew-tap}"
 FORMULA_PATH="Formula/arch-live.rb"
-BASE_URL="https://github.com/RetardRento/archlive/releases/download/v${VERSION}"
+BASE_URL="https://github.com/karthikeyasomayajula/archlive/releases/download/v${VERSION}"
 
 ARM_FILE="arch-live-${VERSION}-aarch64-apple-darwin.tar.gz"
 X86_FILE="arch-live-${VERSION}-x86_64-apple-darwin.tar.gz"
@@ -40,7 +40,7 @@ echo "SHA256 aarch64-linux-gnu:    ${LINUX_ARM_SHA}"
 FORMULA=$(cat <<EOF
 class ArchLive < Formula
   desc "Zero-config real-time architecture visualizer for Node.js and Bun applications"
-  homepage "https://github.com/RetardRento/archlive"
+  homepage "https://github.com/karthikeyasomayajula/archlive"
   version "${VERSION}"
   license "MIT"
 

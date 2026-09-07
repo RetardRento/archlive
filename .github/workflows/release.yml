@@ -179,7 +179,7 @@ jobs:
           if [ -z "${{ secrets.HOMEBREW_TAP_TOKEN }}" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             echo "HOMEBREW_TAP_TOKEN not set — skipping Homebrew update"
-            echo "To enable: create a PAT with repo write access to RetardRento/homebrew-archlive"
+            echo "To enable: create a PAT with repo write access to karthikeyasomayajula/homebrew-archlive"
             echo "Then add it as a repository secret named HOMEBREW_TAP_TOKEN"
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
@@ -190,5 +190,5 @@ jobs:
         env:
           VERSION: ${{ needs.validate.outputs.version }}
           HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
-          TAP_REPO: RetardRento/homebrew-tap
+          TAP_REPO: karthikeyasomayajula/homebrew-tap
         run: bash scripts/update-homebrew-tap.sh
